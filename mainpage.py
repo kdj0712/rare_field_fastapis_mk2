@@ -37,6 +37,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+print("✅ Beanie initialized successfully")
 
 from fastapi.staticfiles import StaticFiles
 # url 경로, 자원 물리 경로, 프로그래밍 측면
