@@ -4,40 +4,38 @@
 <style>
   .name {
     max-width: 250px;
-    /* 최대 너비 설정 */
     word-wrap: break-word;
-    /* 길이가 최대 너비를 넘어가면 줄바꿈 */
   }
 
   .address {
     max-width: 450px;
-    /* 최대 너비 설정 */
     word-wrap: break-word;
-    /* 길이가 최대 너비를 넘어가면 줄바꿈 */
   }
 
   .excellent-info {
     display: none;
-    /* 기본적으로 우수 정보를 숨김 */
   }
   
   .td {
-  text-align: center;
+    text-align: center;
   }
 
+  #map {
+    width: 100%;
+    height: 600px;
+  }
 </style>
-
 
 <form action="" id="maps" class="container" method="get">
   <div class="container">
     <div class="row">
-      <div class="col-12" id="map" style="width: 100%; height: 600px;"></div>
+      <div class="col-12" id="map"></div>
       <div class="col-12">
         <label for="keyword">검색할 장소를 입력하세요</label>
         <input type="text" id="keyword" name="keyword" class="controls" placeholder="입력하기"
           value="{{request._query_params.keyword}}">
         <input type="hidden" id="pos" name="pos" value="{{request._query_params.pos}}">
-        <button type="submit" formmethod="get" onclick="getLocationAndSubmit()">Search</button>
+        <button type="submit" formmethod="get" onclick="getLocationAndSubmit(); return false;">Search</button>
         <div class="row">
           <table id="places">
             <thead>
@@ -50,27 +48,34 @@
             </thead>
             <tbody id="tbody">
               {% for result in results %}
-              <tr>
+              <tr id="hospital-row-{{loop.index0}}">
                 <td class="name">{{result.yadmNm}}</td>
                 <td class="address">{{result.addr}}</td>
                 <td class="td">{{result.telno}}</td>
-                <td class="td"><a href="#" onclick="focusOnMap({{index}}); return false;" data-result-id="{{result.ykiho}}">보기</a>
+                <td class="td">
+                  <a href="#" onclick="focusOnMap({{loop.index0}}); return false;">보기</a>
                 </td>
               </tr>
               <tr>
                 <td colspan="4">
-                  <div onclick="toggleExcellentInfo({{loop.index0}});" style="cursor: pointer;">병원평가</div>
-                  {% if result.excellent_info != "없음" %}
-                  <div id="excellent-info-{{loop.index0}}" class="excellent-info" style="display: none;">
-                    <ul>
-                      {% for info in result.excellent_info %}
-                      <li>{{ info.asmGrdNm }} - {{ info.asmNm }}</li>
-                      {% endfor %}
-                    </ul>
+                  <div onclick="toggleExcellentInfo({{loop.index0}});" style="cursor: pointer; font-weight: bold; padding: 10px; background-color: #f8f9fa;">
+                    병원평가 ▼
                   </div>
-                  {% else %}
-                  <div id="excellent-info-{{loop.index0}}" class="excellent-info" style="display: none;">우수 정보 없음</div>
-                  {% endif %}
+                  <div id="excellent-info-{{loop.index0}}" class="excellent-info">
+                    {% if result.excellent_info != "없음" %}
+                      <ul style="padding: 15px; background-color: #fff; margin: 0;">
+                        {% for info in result.excellent_info %}
+                        <li style="margin: 5px 0;">
+                          <strong>{{ info.asmGrdNm }}</strong> - {{ info.asmNm }}
+                        </li>
+                        {% endfor %}
+                      </ul>
+                    {% else %}
+                      <p style="padding: 15px; background-color: #fff; margin: 0; color: #999;">
+                        우수 정보 없음
+                      </p>
+                    {% endif %}
+                  </div>
                 </td>
               </tr>
               {% endfor %}
@@ -93,31 +98,30 @@
                 </li>
                 <li class="page-item {{ '' if pagination.has_previous_page else 'disabled' }}">
                   <button style="border: none; background: none;" type="submit" class="page-link"
-                    formaction="/info/info_institution/{{pagination.previous_page}}"><svg width="13" height="18"
-                      viewBox="0 0 13 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    formaction="/info/info_institution/{{pagination.previous_page}}">
+                    <svg width="13" height="18" viewBox="0 0 13 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M10 3L4 9L10 15" stroke="#696969" stroke-width="5" stroke-linecap="round" />
-                    </svg></button>
+                    </svg>
+                  </button>
                 </li>
                 {% for page_num in pagination.current_page_range %}
-                <li class=" page-item {{ 'active' if page_num == pagination.current_page else '' }}">
-                  <button style="border: none; background: none; color: black;" type=" submit" class="page-link"
+                <li class="page-item {{ 'active' if page_num == pagination.current_page else '' }}">
+                  <button style="border: none; background: none; color: black;" type="submit" class="page-link"
                     formaction="/info/info_institution/{{ page_num }}">
                     {{page_num}}
                   </button>
                 </li>
                 {% endfor %}
-                <li class=" page-item {{ '' if pagination.has_next_page else 'disabled' }}">
-                  <button style="border: none; background: none;" type=" submit" class="page-link"
-                    formaction="/info/info_institution/{{ pagination.next_page }}"><svg width="13" height="18"
-                      viewBox="0 0 13 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <li class="page-item {{ '' if pagination.has_next_page else 'disabled' }}">
+                  <button style="border: none; background: none;" type="submit" class="page-link"
+                    formaction="/info/info_institution/{{ pagination.next_page }}">
+                    <svg width="13" height="18" viewBox="0 0 13 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M3 15L9 9L3 3" stroke="#696969" stroke-width="5" stroke-linecap="round" />
-                    </svg>
-                    <path d="M4 0V22" stroke="#EDEDED" stroke-width="7" />
                     </svg>
                   </button>
                 </li>
-                <li class=" page-item {{ '' if pagination.has_next_block else ' disabled' }}">
-                  <button style="border: none; background: none;" type=" submit" class="page-link"
+                <li class="page-item {{ '' if pagination.has_next_block else 'disabled' }}">
+                  <button style="border: none; background: none;" type="submit" class="page-link"
                     formaction="/info/info_institution/{{ pagination.last_page }}">
                     <svg width="21" height="18" viewBox="0 0 21 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M3 15L9 9L3 3" stroke="#696969" stroke-width="5" stroke-linecap="round" />
@@ -135,39 +139,117 @@
 </form>
 {% endblock main_container%}
 
-
 {% block js %}
-<script type="text/javascript">
-  var resultsFromPython = {{ results | tojson | safe }};
-</script>
-<script>
-  let map, service, infowindow;
-  const defaultPos = { lat: 37.5665, lng: 126.9780 }; // 기본 위치 (서울 좌표)
+<!-- Naver Map API -->
+<script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId={{ YOUR_CLIENT_ID }}"></script>
 
-  function callback(results, status) {
-    if (status === google.maps.places.PlacesServiceStatus.OK) {
-      for (let i = 0; i < results.length; i++) {
-        createMarker(results[i]);
-      }
+<script type="text/javascript">
+  var resultsFromPython = {{ results | tojson | safe if results else '[]' }};
+  console.log('Results:', resultsFromPython);
+  console.log('Results count:', resultsFromPython.length);
+  
+  var map = null;
+  var markers = [];
+</script>
+
+<script>
+  // 페이지 로드 시 지도 초기화
+  document.addEventListener('DOMContentLoaded', function() {
+    initMap();
+  });
+
+  // Naver Map 초기화
+  function initMap() {
+    if (resultsFromPython.length === 0) {
+      // 기본 위치 (서울 시청)
+      var defaultLat = 37.5665;
+      var defaultLng = 126.9780;
+    } else {
+      // 첫 번째 검색 결과 위치
+      var defaultLat = parseFloat(resultsFromPython[0].YPos);
+      var defaultLng = parseFloat(resultsFromPython[0].XPos);
+    }
+
+    var mapOptions = {
+      center: new naver.maps.LatLng(defaultLat, defaultLng),
+      zoom: 15
+    };
+
+    map = new naver.maps.Map('map', mapOptions);
+
+    // 검색 결과가 있으면 마커 추가
+    if (resultsFromPython.length > 0) {
+      addMarkers();
     }
   }
 
-  function getLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(sendPositionToServer, showError);
-    } else {
-      alert("Geolocation is not supported by this browser.");
+  // 마커 추가
+  function addMarkers() {
+    // 기존 마커 제거
+    markers.forEach(function(marker) {
+      marker.setMap(null);
+    });
+    markers = [];
+
+    resultsFromPython.forEach(function(hospital, index) {
+      var lat = parseFloat(hospital.YPos);
+      var lng = parseFloat(hospital.XPos);
+
+      var marker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(lat, lng),
+        map: map,
+        title: hospital.yadmNm,
+        icon: {
+          content: '<div style="background-color: #4285f4; color: white; padding: 5px 10px; border-radius: 20px; font-weight: bold;">' + (index + 1) + '</div>',
+          anchor: new naver.maps.Point(15, 15)
+        }
+      });
+
+      // 마커 클릭 이벤트
+      naver.maps.Event.addListener(marker, 'click', function() {
+        focusOnMap(index);
+      });
+
+      // 정보창 생성
+      var infoWindow = new naver.maps.InfoWindow({
+        content: '<div style="padding:10px; min-width:200px;">' +
+                 '<h5 style="margin:0 0 5px 0;">' + hospital.yadmNm + '</h5>' +
+                 '<p style="margin:0; font-size:12px;">' + hospital.addr + '</p>' +
+                 '<p style="margin:5px 0 0 0; font-size:12px;">📞 ' + hospital.telno + '</p>' +
+                 '</div>'
+      });
+
+      // 마커 호버 이벤트
+      naver.maps.Event.addListener(marker, 'mouseover', function() {
+        infoWindow.open(map, marker);
+      });
+
+      naver.maps.Event.addListener(marker, 'mouseout', function() {
+        infoWindow.close();
+      });
+
+      markers.push(marker);
+    });
+
+    // 모든 마커가 보이도록 지도 범위 조정
+    if (markers.length > 0) {
+      var bounds = new naver.maps.LatLngBounds();
+      markers.forEach(function(marker) {
+        bounds.extend(marker.getPosition());
+      });
+      map.fitBounds(bounds);
     }
   }
 
   function getLocationAndSubmit() {
+    event.preventDefault();
+    
     navigator.geolocation.getCurrentPosition(
-      async function (position) {
+      function (position) {
         const yPos = position.coords.latitude.toString();
         const xPos = position.coords.longitude.toString();
         const pos = `${yPos},${xPos}`;
         document.getElementById('pos').value = pos;
-        const keyword = document.getElementById('keyword').value;
         document.getElementById('maps').submit();
       },
       function (error) {
@@ -177,123 +259,51 @@
     );
   }
 
-  function initMap() {
-    infowindow = new google.maps.InfoWindow();
-
-    const userLocationConsent = localStorage.getItem('userLocationConsent');
-
-    if (userLocationConsent === 'granted' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        const pos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: pos,
-          zoom: 15,
-          draggable: true,
-          zoomControl: true,
-        });
-        displayMarkers(resultsFromPython);
-      }, function () {
-        handleLocationError(true, infowindow, defaultPos);
-      });
-    } else if (userLocationConsent === null) {
-      const confirmed = confirm("이 웹사이트는 위치 정보를 사용하여 보다 나은 서비스를 제공합니다. 위치 정보를 제공하시겠습니까?");
-
-      if (confirmed && navigator.geolocation) {
-        localStorage.setItem('userLocationConsent', 'granted');
-        navigator.geolocation.getCurrentPosition(function (position) {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-
-          map = new google.maps.Map(document.getElementById('map'), {
-            center: pos,
-            zoom: 15,
-            draggable: true,
-            zoomControl: true,
-          });
-          displayMarkers(resultsFromPython);
-        }, function () {
-          handleLocationError(true, infowindow, defaultPos);
-        });
-      } else if (!confirmed) {
-        handleLocationError(false, infowindow, defaultPos);
-      } else {
-        handleLocationError(false, infowindow, defaultPos);
-      }
-    } else {
-      handleLocationError(false, infowindow, defaultPos);
-    }
-  }
-
   function toggleExcellentInfo(index) {
     var infoElement = document.getElementById('excellent-info-' + index);
-    if (infoElement.style.display === 'none') {
+    if (infoElement.style.display === 'none' || infoElement.style.display === '') {
       infoElement.style.display = 'block';
     } else {
       infoElement.style.display = 'none';
     }
   }
-  function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-    map = new google.maps.Map(document.getElementById('map'), {
-      center: pos,
-      zoom: 15,
-    });
 
-    infoWindow.setPosition(pos);
-    infoWindow.setContent(browserHasGeolocation ?
-      'Error: The Geolocation service failed.' :
-      'Error: Your browser doesn\'t support geolocation.');
-    infoWindow.open(map);
-  }
-
-  let markers = [];
-
-  function createMarker(place) {
-    if (!place.geometry || !place.geometry.location) return;
-    const marker = new google.maps.Marker({
-      map,
-      position: place.geometry.location,
-    });
-
-    google.maps.event.addListener(marker, 'click', function () {
-      infowindow.setContent(place.name);
-      infowindow.open(map, this);
-    });
-  }
-
-  function displayMarkers(results) {
-    if (results.length === 0) return;
-
-    markers.forEach((marker) => marker.setMap(null)); // 기존 마커 제거
-    markers = [];
-
-    results.forEach((result) => {
-      const marker = new google.maps.Marker({
-        position: { lat: parseFloat(result.YPos), lng: parseFloat(result.XPos) },
-        map: map,
-        title: result.yadmNm
-      });
-      markers.push(marker);
-
-      marker.addListener('click', () => {
-        infowindow.setContent(`${result.yadmNm}<br>${result.addr}`);
-        infowindow.open(map, marker);
-      });
-    });
-  }
-
+  // 지도에서 해당 병원 위치로 포커스
   function focusOnMap(index) {
-    const marker = markers[index];
-    map.setCenter(marker.getPosition());
-    map.setZoom(16);
-  }
+    if (index >= resultsFromPython.length || index >= markers.length) {
+      return;
+    }
 
-  window.onload = initMap;
+    var hospital = resultsFromPython[index];
+    var marker = markers[index];
+    
+    // 지도 중심 이동
+    var position = marker.getPosition();
+    map.setCenter(position);
+    map.setZoom(16);
+
+    // 테이블 행 하이라이트
+    var rows = document.querySelectorAll('#tbody tr');
+    rows.forEach(function(row) {
+      row.style.backgroundColor = '';
+    });
+    
+    var targetRow = document.getElementById('hospital-row-' + index);
+    if (targetRow) {
+      targetRow.style.backgroundColor = '#ffffcc';
+      targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // 정보창 표시
+    var infoWindow = new naver.maps.InfoWindow({
+      content: '<div style="padding:15px; min-width:250px;">' +
+               '<h5 style="margin:0 0 10px 0; color: #4285f4;">' + hospital.yadmNm + '</h5>' +
+               '<p style="margin:5px 0; font-size:13px;">📍 ' + hospital.addr + '</p>' +
+               '<p style="margin:5px 0; font-size:13px;">📞 ' + hospital.telno + '</p>' +
+               '</div>'
+    });
+    
+    infoWindow.open(map, marker);
+  }
 </script>
-<script async src="https://maps.googleapis.com/maps/api/js?key={{ API_KEY }}&libraries=places&callback=initMap&language=ko"></script>
 {% endblock js %}

@@ -212,7 +212,7 @@ async def get_excellent_hospital_info(ykiho: str):
     각 병원별 고유 번호(ykiho)를 사용하여 우수 병원 정보를 조회하는 함수입니다.
     """
     ykiho = ykiho.strip("'")  #
-    url = f"http://apis.data.go.kr/B551182/exclInstHospAsmInfoService/getExclInstHospAsmInfo?ServiceKey={pubapi_key}&pageNo=1&numOfRows=23&ykiho={ykiho}&_type=json"
+    url = f"https://apis.data.go.kr/B551182/exclInstHospAsmInfoService1/getExclInstHospAsmInfo1?serviceKey={pubapi_key}&pageNo=1&numOfRows=23&ykiho={ykiho}&_type=json"
     response = requests.get(url)
     ydata = response.json()
     pass
@@ -370,11 +370,11 @@ async def search_hospital(
             page_data, pagination = paginationforinstitute(extracted_data, page_number, totalCount)
             return templates.TemplateResponse(
                 name="info/info_institution.html",
-                context={"request": request, 'pagination': pagination, "results": page_data})
+                context={"request": request, 'pagination': pagination, "results": page_data, "YOUR_CLIENT_ID":api_key})
         else:
-            return templates.TemplateResponse("info/info_institution.html", {"request": request, 'pagination': None, "results": []})
+            return templates.TemplateResponse("info/info_institution.html", {"request": request, 'pagination': None, "results": [], "YOUR_CLIENT_ID":api_key})
     except:
-        return templates.TemplateResponse("info/info_institution.html", {"request": request,  'pagination': None, "results": []})
+        return templates.TemplateResponse("info/info_institution.html", {"request": request,  'pagination': None, "results": [], "YOUR_CLIENT_ID":api_key})
 
 @router.post("/institution/{page_number}")
 @router.post("/institution") 
