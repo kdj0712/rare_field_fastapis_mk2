@@ -179,20 +179,51 @@ def set_search_radius(xPos, yPos, under):
             return 10000  # 범위 안에 있는 경우
     return 3000  # 범위 안에 있는 지역이 없는 경우
 # 실제 검색 함수
+# def search_hospitals(input_value: str, xPos: float, yPos: float, page_number: int = 1):
+#     input_value = preprocess_input(input_value)
+#     code = find_hospital_code(input_value)
+#     radius = set_search_radius(xPos, yPos,under)
+#     if code and input_value.strip() in hospital_types:
+#         param = 'dgsbjtCd'
+#         value = code
+#         # 코드로 검색할 경우에만 radius 값을 구합니다.
+#         radius = set_search_radius(xPos, yPos, under)
+#         queryParams = f'?ServiceKey={pubapi_key}&pageNo={page_number}&{param}={value}&xPos={xPos}&yPos={yPos}&radius={radius}&_type=json'
+#     else:
+#         param = 'yadmNm'
+#         value = input_value
+#         # 병원 이름으로 검색할 경우에는 radius 파라미터를 추가하지 않습니다.
+#         queryParams = f'?ServiceKey={pubapi_key}&pageNo={page_number}&{param}={value}&xPos={xPos}&yPos={yPos}&_type=json'
+    
+#     baseUrl = 'http://apis.data.go.kr/B551182/hospInfoServicev2/getHospBasisList'
+#     fullUrl = baseUrl + queryParams
+#     response = requests.get(fullUrl)
+#     data = response.json()
+#     body_data = data['response']['body']['items']['item']
+#     totalCount = data['response']['body']['totalCount']
+#     return body_data,totalCount
+def find_hospital_code(input_value: str) -> str:
+    """
+    입력값이 hospital_types의 키와 완전히 일치할 때만 코드 반환.
+    """
+    if input_value in hospital_types:
+        return hospital_types[input_value]
+    return ''
+
 def search_hospitals(input_value: str, xPos: float, yPos: float, page_number: int = 1):
     input_value = preprocess_input(input_value)
     code = find_hospital_code(input_value)
-    radius = set_search_radius(xPos, yPos,under)
-    if code and input_value.strip() in hospital_types:
+    radius = set_search_radius(xPos, yPos, under)
+    
+    # code가 있으면 진료과목 코드 검색
+    if code:
         param = 'dgsbjtCd'
         value = code
-        # 코드로 검색할 경우에만 radius 값을 구합니다.
-        radius = set_search_radius(xPos, yPos, under)
         queryParams = f'?ServiceKey={pubapi_key}&pageNo={page_number}&{param}={value}&xPos={xPos}&yPos={yPos}&radius={radius}&_type=json'
     else:
+        # code가 없으면 병원 이름 검색
         param = 'yadmNm'
         value = input_value
-        # 병원 이름으로 검색할 경우에는 radius 파라미터를 추가하지 않습니다.
         queryParams = f'?ServiceKey={pubapi_key}&pageNo={page_number}&{param}={value}&xPos={xPos}&yPos={yPos}&_type=json'
     
     baseUrl = 'http://apis.data.go.kr/B551182/hospInfoServicev2/getHospBasisList'
@@ -201,7 +232,7 @@ def search_hospitals(input_value: str, xPos: float, yPos: float, page_number: in
     data = response.json()
     body_data = data['response']['body']['items']['item']
     totalCount = data['response']['body']['totalCount']
-    return body_data,totalCount
+    return body_data, totalCount
 
 def paginationforinstitute(data: List[Dict[str, Any]], page_number, total_records, records_per_page=10) -> (List[Dict[str, Any]], Paginations):
     pagination = Paginations(total_records=total_records, current_page=page_number, records_per_page=records_per_page)
