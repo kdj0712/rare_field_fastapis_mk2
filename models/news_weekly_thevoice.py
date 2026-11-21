@@ -1,0 +1,16 @@
+from typing import Optional, List
+from datetime import datetime
+from beanie import Document, Link
+from pydantic import BaseModel, EmailStr
+
+class news_weekly_thevoice(Document):
+    _id : Optional[str] = None
+    news_title: Optional[str] = None
+    news_datetime: Optional[datetime] = None
+    news_contents : Optional[str] = None
+    news_url : Optional[str] = None
+    news_image : Optional[str] = None
+    news_paper : Optional[str] = None
+
+    class Settings:
+        name = "news_weekly_thevoice"

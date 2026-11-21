@@ -9,6 +9,8 @@ from models.info_rarediseases import diseases
 from models.institution import Institutions
 from models.user_member import members
 from models.trend_news import news_trends
+from models.news_weekly import news_weekly
+from models.news_weekly_thevoice import news_weekly_thevoice
 from models.other_QnA import QnA
 from models.manag_notice_list import notice
 from models.program_list import program
@@ -18,6 +20,7 @@ from models.trend_guideline import trend_guideline
 from models.trend_law import trend_law
 from models.trend_site import trend_site
 from models.info_academicinfo import info_academicinfo_Riss,info_academicinfo_eng
+from models.helpline_symptoms import HelplineSymptoms
 
 import os
 
@@ -40,8 +43,8 @@ class Settings(BaseSettings):
             await init_beanie(database=client.get_default_database(),
                               document_models=[academicinfo, diseases, Institutions,
                                                 members, news_trends, QnA, program,
-                                                notice, community, trend_documents,
-                                                trend_guideline, trend_law,
+                                                notice, community, trend_documents,HelplineSymptoms,
+                                                trend_guideline, trend_law,news_weekly,news_weekly_thevoice,
                                                 trend_site, info_academicinfo_Riss,info_academicinfo_eng])
 
     class Config:

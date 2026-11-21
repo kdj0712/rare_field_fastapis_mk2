@@ -226,7 +226,7 @@ def search_hospitals(input_value: str, xPos: float, yPos: float, page_number: in
         value = input_value
         queryParams = f'?ServiceKey={pubapi_key}&pageNo={page_number}&{param}={value}&xPos={xPos}&yPos={yPos}&_type=json'
     
-    baseUrl = 'http://apis.data.go.kr/B551182/hospInfoServicev2/getHospBasisList'
+    baseUrl = 'https://apis.data.go.kr/B551182/hospInfoServicev2/getHospBasisList'
     fullUrl = baseUrl + queryParams
     response = requests.get(fullUrl)
     data = response.json()
