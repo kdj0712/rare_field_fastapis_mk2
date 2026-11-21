@@ -267,7 +267,7 @@ async def scrape_helpline_symptoms_optimized(page_num, headless, existing_urls, 
                 cleaned_data = {k: v for k, v in data.items() if v}
                 
                 # Beanie의 insert_one 대신 MongoDB 직접 접근
-                await HelplineSymptoms.get_motor_collection().insert_one(cleaned_data)
+                await HelplineSymptoms.get_pymongo_collection().insert_one(cleaned_data)
                 
                 # 중복 체크용 세트에 추가
                 if cleaned_data.get('dise_url'):

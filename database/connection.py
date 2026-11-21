@@ -24,7 +24,7 @@ from models.helpline_symptoms import HelplineSymptoms
 
 import os
 
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import AsyncMongoClient
 
 from pydantic_settings import BaseSettings
 
@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     pw : Optional[str] = None
     async def initialize_database(self):
         if self.DATABASE_URL is not None:
-            client = AsyncIOMotorClient(self.DATABASE_URL)
+            client = AsyncMongoClient(self.DATABASE_URL)
             await init_beanie(database=client.get_default_database(),
                               document_models=[academicinfo, diseases, Institutions,
                                                 members, news_trends, QnA, program,
@@ -157,14 +157,14 @@ class Database:
             return documents, pagination
         return documents, pagination
 
-    async def gbcwp_reverse_year(self, conditions: dict, page_number, records_per_page=10) -> [Any]:
-        total = await self.model.find(conditions).count()
-        pagination = Paginations(total_records=total, current_page=page_number, records_per_page=records_per_page)
-        # 내림차순으로 정렬하기 위해 sort({_id: -1})를 적용합니다.
-        documents = await self.model.find(conditions).sort([('research_year', -1)]).skip(pagination.start_record_number-1).limit(pagination.records_per_page).to_list()
-        if documents:
-            return documents, pagination
-        return documents, pagination
+    # async def gbcwp_reverse_year(self, conditions: dict, page_number, records_per_page=10) -> [Any]:
+    #     total = await self.model.find(conditions).count()
+    #     pagination = Paginations(total_records=total, current_page=page_number, records_per_page=records_per_page)
+    #     # 내림차순으로 정렬하기 위해 sort({_id: -1})를 적용합니다.
+    #     documents = await self.model.find(conditions).sort([('research_year', -1)]).skip(pagination.start_record_number-1).limit(pagination.records_per_page).to_list()
+    #     if documents:
+    #         return documents, pagination
+    #     return documents, pagination
     async def gbcwp_reverse_year(self, conditions: dict, page_number, records_per_page=10) -> [Any]:
         total = await self.model.find(conditions).count()
         pagination = Paginations(total_records=total, current_page=page_number, records_per_page=records_per_page)

@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 from sklearn.feature_extraction.text import TfidfVectorizer
 from utils.paginations import Paginations
 from sklearn.metrics.pairwise import cosine_similarity
-from google.cloud import storage
 import urllib.parse
 import pandas as pd
 import requests
@@ -20,7 +19,6 @@ import sys
 load_dotenv()
 pubapi_key = os.getenv("PUBLIC_API_KEY")
 api_key = os.getenv("API_KEY")
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/app/teamKim/macro-atom-415806-fd4035d471e1.json"
 router = APIRouter()
 
 from fastapi.staticfiles import StaticFiles
@@ -47,17 +45,6 @@ collection_info_academicinfo_eng = Database(info_academicinfo_eng)
 
 templates = Jinja2Templates(directory="templates/")
 ### 검색 모델 적용 조건---------------------------------------------------------------------------------------
-def load_pickle_from_gcs(bucket_name, file_name):
-    """Google Cloud Storage에서 피클 파일을 로드합니다."""
-    storage_client = storage.Client()
-    bucket = storage_client.get_bucket(bucket_name)
-    blob = bucket.blob(file_name)
-    pickle_data = blob.download_as_bytes()
-    return pickle.loads(pickle_data)
-bucket_name = 'savehomes'
-file_name = 'search_symptoms.pkl'
-# vectorizer = load_pickle_from_gcs(bucket_name, file_name)
-
 with open('data/pkl/vectorizer.pkl', 'rb') as file:
     vectorizer = pickle.load(file)
 
